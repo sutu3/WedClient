@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link,useNavigate } from "react-router-dom";
+import {Userdata} from "../Redux/Selector.jsx"
 import {
     Navbar,
     NavbarBrand,
@@ -46,6 +47,7 @@ import { useDispatch } from "react-redux";
     CreateOTP,
 } from "../Redux/AccountSlice";*/
 import { useSelector } from "react-redux";
+import UserSlice, {SignIn} from "../Redux/UserSlice.jsx";
 /*
 import { infor, orderNoneSignup, Product, Search } from "../Redux/Selector";
 */
@@ -63,19 +65,10 @@ const arr = [
     { name: "Female", link: "/gender?name=Nữ" },
     { name: "Unisex", link: "/gender?name=Unisex" },
 ];
-const showToast = () => {
-    toast.success("hello", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-    });
-};
+
 export default function App() {
     const navigate=useNavigate()
+    const Infor=useSelector(Userdata)
 /*    const order = useSelector(orderNoneSignup);
     const product = useSelector(Product);*/
     const dispatch = useDispatch();
@@ -125,7 +118,7 @@ export default function App() {
 /*
     const search=useSelector(Search)
 */
-    const handleSignIn = () => {
+    const handleSignIn = async () => {
         setflat(true);
         onOpen();
     };
@@ -184,14 +177,9 @@ export default function App() {
         }*/
     };
     const handleCheckSignIn = async () => {
-        /*await dispatch(
-            CheckLogin({
-                email: userIn.email,
-                pass: userIn.pass,
-            })
-        );
-        localStorage.getItem("infor") ? setdisplay(true) : setdisplay(false);
-        onClose();*/
+        await dispatch(SignIn({username:userIn.email,password:userIn.pass}))
+        localStorage.getItem("tokenuser") ? setdisplay(true) : setdisplay(false);
+        onClose();
     };
     return (
         <div className="w-full fixed z-50 backdrop-blur-3xl flex flex-row h-16 justify-around  shadow-sm shadow-slate-300 border-slate-200">
@@ -485,7 +473,7 @@ export default function App() {
                                     ],
                                 }}
                             >
-                                {/*<DropdownSection aria-label="Profile & Actions" showDivider>
+                                <DropdownSection aria-label="Profile & Actions" showDivider>
                                     <DropdownItem
                                         isReadOnly
                                         key="profile"
@@ -554,7 +542,7 @@ export default function App() {
                                     >
                                         Log Out
                                     </DropdownItem>
-                                </DropdownSection>*/}
+                                </DropdownSection>
                             </DropdownMenu>
                         </Dropdown>
                     )}
@@ -578,10 +566,10 @@ export default function App() {
                                                 }}
                                                 key={"Email"}
                                                 type="email"
-                                                label="Email"
+                                                label="Name"
                                                 className="w-full"
                                                 labelPlacement={"outside-left"}
-                                                placeholder="Enter Your Email"
+                                                placeholder="Enter Your Name"
                                                 classNames={{
                                                     inputWrapper:
                                                         "border-[2px] border-slate-200 rounded-lg w-[300px]",

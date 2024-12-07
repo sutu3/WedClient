@@ -1,16 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { https } from "./Https";
 import  {toasityComponent,StatusEnum} from "../Toasity/ToasityComponent.jsx"
-const local = https + "/products";
+const local = https + "/orderitems";
 const initialState = {
-    Product: localStorage.getItem("product")
-        ? JSON.parse(localStorage.getItem("product"))
-        : [],
+    Order: {},
     loading: false,
     error: null,
 };
-const ProductApi = createSlice({
-  name: "product",
+const OrderItemApi = createSlice({
+  name: "orderitem",
     initialState,
   reducers: {
     /*ChangeIntrospect: (state) => {
@@ -20,27 +18,23 @@ const ProductApi = createSlice({
   },
   extraReducers: (builder) => {
     builder
-        .addCase(GetProduct.fulfilled,(state,action)=>{
-            const result=action.payload;
-            if(result.success)
-            {
-                state.Product=result.result;
-                localStorage.setItem('product', JSON.stringify(result.result));
-            }
-        })
+
 
 
   }
 });
 
-export const GetProduct = createAsyncThunk(
-  "product/GetProduct",
-    async () => {
+export const PostOrderItem = createAsyncThunk(
+  "orderitem/PostOrderItem",
+    async (data1) => {
         try {
             const res = await fetch(`${local}`, {
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${data1.token}`,
                 },
+                method: "POST",
+                body: JSON.stringify(data1.data),
             });
             const data = await res.json();
             return data;
@@ -51,11 +45,5 @@ export const GetProduct = createAsyncThunk(
             );
         }
     }
-);
-export const FetchInfom = () => {
-    return async function check(dispatch, getState) {
-
-        await dispatch(GetProduct());
-    };
-};
-export default ProductApi;
+)
+export default OrderItemApi;

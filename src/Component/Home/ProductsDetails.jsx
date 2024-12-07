@@ -24,13 +24,15 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import {Product} from "../Redux/Selector.jsx";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {AddtoCard} from "../Redux/UserSlice.jsx";
 
 
 
 const ProductDetail = () => {
   const { id } = useParams();
   console.log(id)
+  const dispatch=useDispatch();
   /*const { id } = useParams<{ id: string }>();*/
   // Sample data for the product (replace with API data later)
   const product = useSelector(Product)[id||0];
@@ -48,12 +50,13 @@ const ProductDetail = () => {
   const handleChangeSize = (event) => {
     setSize(event.target.value);
   };
-
+  const handleChangeColor = (event) => {
+    setColor(event.target.value);
+  };
   // Handle quantity increase/decrease
   const handleIncreaseQuantity = () => {
-    if (quantity < product.available) {
       setQuantity(quantity + 1);
-    }
+
   };
 
   const handleDecreaseQuantity = () => {
@@ -66,7 +69,6 @@ const ProductDetail = () => {
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
-
   return (
     <Container>
       <Box display="flex" flexDirection="column" alignItems="start" mt={2}>
@@ -136,7 +138,7 @@ const ProductDetail = () => {
                         id="color-select"
                         sx={{ width: 120 }}
                         value={color}
-                        onChange={handleChangeSize} // Sử dụng handleChangeColor cho color
+                        onChange={handleChangeColor} // Sử dụng handleChangeColor cho color
                         label="Color"
                         name="color"
                     >
@@ -183,15 +185,23 @@ const ProductDetail = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() =>
-                      alert(`Added ${quantity} item(s) to your cart!`)
+                    onClick={async () =>{
+                      await dispatch(AddtoCard({
+                        productname:product.name,
+                        colorname:color,
+                        sizename:size,
+                        quantity:quantity,
+                        price_at_sale:
+                        product.varients
+                            ?.find((el) => el.color.colorname == color && el.size.sizename == size)
+                            ?.versions.find((el) => el.isdeleted == false)?.selling_price
+                      }))
                     }
-                    disabled
+
+                    }
+
                   >
                     Add to Cart
-                  </Button>
-                  <Button variant="contained" color="secondary" disabled>
-                    Buy Now
                   </Button>
                 </Box>
               </CardContent>

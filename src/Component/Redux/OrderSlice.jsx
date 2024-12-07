@@ -1,31 +1,30 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { https } from "./Https";
 import  {toasityComponent,StatusEnum} from "../Toasity/ToasityComponent.jsx"
-const local = https + "/products";
+const local = https + "/orders";
 const initialState = {
-    Product: localStorage.getItem("product")
-        ? JSON.parse(localStorage.getItem("product"))
-        : [],
+    Order: {},
     loading: false,
     error: null,
 };
-const ProductApi = createSlice({
-  name: "product",
+const OrderApi = createSlice({
+  name: "order",
     initialState,
   reducers: {
-    /*ChangeIntrospect: (state) => {
-      state.Introspect=true;
-      localStorage.setItem('token', JSON.stringify(true));
-    },*/
+    ChangeOrder: (state,action) => {
+        state.Order=action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-        .addCase(GetProduct.fulfilled,(state,action)=>{
+        .addCase(PostOrder.fulfilled,(state,action)=>{
             const result=action.payload;
             if(result.success)
             {
-                state.Product=result.result;
-                localStorage.setItem('product', JSON.stringify(result.result));
+                state.Order=result.result;
+            }
+            else{
+                toasityComponent("cause: "+result.message,StatusEnum.ERROR)
             }
         })
 
@@ -33,14 +32,17 @@ const ProductApi = createSlice({
   }
 });
 
-export const GetProduct = createAsyncThunk(
-  "product/GetProduct",
-    async () => {
+export const PostOrder = createAsyncThunk(
+  "order/PostOrder",
+    async (data1) => {
         try {
             const res = await fetch(`${local}`, {
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${data1.token}`,
                 },
+                method: "POST",
+                body:JSON.stringify(data1.data)
             });
             const data = await res.json();
             return data;
@@ -52,10 +54,4 @@ export const GetProduct = createAsyncThunk(
         }
     }
 );
-export const FetchInfom = () => {
-    return async function check(dispatch, getState) {
-
-        await dispatch(GetProduct());
-    };
-};
-export default ProductApi;
+export default OrderApi;
