@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import {Product} from "../Redux/Selector.jsx";
+import {Product, SizeData} from "../Redux/Selector.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {AddtoCard} from "../Redux/UserSlice.jsx";
 
@@ -33,6 +33,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   console.log(id)
   const dispatch=useDispatch();
+  const sizeapi=useSelector(SizeData);
   /*const { id } = useParams<{ id: string }>();*/
   // Sample data for the product (replace with API data later)
   const product = useSelector(Product)[id||0];
@@ -64,7 +65,7 @@ const ProductDetail = () => {
       setQuantity(quantity - 1);
     }
   };
-
+  console.log(color)
   // Handle tab change
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -189,12 +190,11 @@ const ProductDetail = () => {
                       await dispatch(AddtoCard({
                         productname:product.name,
                         colorname:color,
-                        sizename:size,
+                        sizename:sizeapi.find((el)=>el.size==size).sizename,
                         quantity:quantity,
-                        price_at_sale:
-                        product.varients
-                            ?.find((el) => el.color.colorname == color && el.size.sizename == size)
-                            ?.versions.find((el) => el.isdeleted == false)?.selling_price
+                        price_at_sale:product.varients
+                            .find((el) => el.color.colorname == color && el.size.size == size)
+                            .versions.find((el) => el.isdeleted == false).selling_price
                       }))
                     }
 

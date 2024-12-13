@@ -55,6 +55,9 @@ const UserSlice = createSlice({
             state.token = null;
             localStorage.removeItem('tokenuser');
         },
+        updateUser: (state, action) => {
+            state.user = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -78,9 +81,10 @@ export const SignIn = (data) => { // Replace 'any' with proper type
             }
             await dispatch(Getmyinfor(token));
             dispatch(Authentication.actions.ChangeIntrospect);
-            if(orders.find((el)=>el.status=="PENDING"))
+            const user=getState().user.user;
+            if(user.orders.find((el)=>el.status=="PENDING"))
             {
-                dispatch(OrderApi.actions.ChangeOrder(orders.find((el)=>el.status=="PENDING")||{}));
+                dispatch(OrderApi.actions.ChangeOrder(user.orders.find((el)=>el.status=="PENDING")||{}));
             }
         } catch (error) {
             toasityComponent('SignUp process failed: '+error ,StatusEnum.ERROR)
@@ -96,7 +100,7 @@ export const AddtoCard = (data) => { // Replace 'any' with proper type
             const token = getState().authentication.token;
             if(!orders.find((el)=>el.status=="PENDING"))
             {
-                await dispatch(PostOrder({data: {userid: user.id},token:token}));
+                await dispatch(PostOrder({data: {userid: user.id,totalamount:0},token:token}));
             }else{
                 dispatch(OrderApi.actions.ChangeOrder(orders.find((el)=>el.status=="PENDING")));
             }
@@ -109,8 +113,8 @@ export const AddtoCard = (data) => { // Replace 'any' with proper type
                  quantity:data.quantity,
                  price_at_sale :data.price_at_sale
             },token:token}))
-            order.orderitems.push(orderitem.payload.result);
-            dispatch(OrderApi.actions.ChangeOrder(order))
+            console.log(orderitem)
+            dispatch(OrderApi.actions.ChangeItem(orderitem.payload.result))
         } catch (error) {
             toasityComponent('SignUp process failed: '+ error,StatusEnum.ERROR);
             // You might want to dispatch an error action here

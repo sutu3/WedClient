@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { https } from "./Https";
 import  {toasityComponent,StatusEnum} from "../Toasity/ToasityComponent.jsx"
+import {GetColors} from "./ColorSlice.jsx";
+import {GetSizes} from "./SizeSlice.jsx";
 const local = https + "/products";
 const initialState = {
     Product: localStorage.getItem("product")
@@ -56,6 +58,8 @@ export const FetchInfom = () => {
     return async function check(dispatch, getState) {
 
         await dispatch(GetProduct());
+        await dispatch(GetColors())
+        await dispatch(GetSizes())
     };
 };
 export default ProductApi;
